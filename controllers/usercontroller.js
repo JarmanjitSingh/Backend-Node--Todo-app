@@ -17,7 +17,6 @@ export const login = async (req, res, next) => {
     return res
     .status(404)
     .json({ success: false, message: "Invalid Email or Password." });
-    
     setcookie(user, res, `Welcome back, ${user.name}`, 200);
   } catch (error) {
     next(error);
