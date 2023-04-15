@@ -1,40 +1,23 @@
 import { UserModel } from "../models/usermodel.js";
 import bcrypt from "bcrypt";
-import { setcookie } from "../utils/features.js";
+import { sendcookie } from "../utils/features.js";
 
 export const login = async (req, res, next) => {
-  // try {
-  //   const { email, password } = req.body;
-
-  //   const user = await UserModel.findOne({ email }).select("+password");
-  //   if (!user)
-  //     return res
-  //       .status(404)
-  //       .json({ success: false, message: "Invalid Email or Password." });
-
-  //   const isMatch = await bcrypt.compare(password, user.password);
-  //   setcookie(user, res, `Welcome back, ${user.name}`, 200);
-  //   if (!isMatch)
-  //   return res
-  //   .status(404)
-  //   .json({ success: false, message: "Invalid Email or Password." });
-  // } catch (error) {
-  //   next(error);
-  // }
-
   try {
     const { email, password } = req.body;
 
     const user = await UserModel.findOne({ email }).select("+password");
-
-    if (!user) return next(new ErrorHandler("Invalid Email or Password", 400));
+    if (!user)
+      return res
+        .status(404)
+        .json({ success: false, message: "Invalid Email or Password." });
 
     const isMatch = await bcrypt.compare(password, user.password);
-
+    sendcookie(user, res, `Welcome back, ${user.name}`, 200);
     if (!isMatch)
-      return next(new ErrorHandler("Invalid Email or Password", 400));
-
-    setcookie(user, res, `Welcome back, ${user.name}`, 200);
+    return res
+    .status(404)
+    .json({ success: false, message: "Invalid Email or Password." });
   } catch (error) {
     next(error);
   }
@@ -53,7 +36,7 @@ export const register = async (req, res, next) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     user = await UserModel.create({ name, email, password: hashedPassword });
 
-    setcookie(user, res, "Registered Successfully", 201);
+    sendcookie(user, res, "Registered Successfully", 201);
   } catch (error) {
     next(error);
   }
