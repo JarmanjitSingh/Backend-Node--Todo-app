@@ -14,11 +14,11 @@ export const login = async (req, res, next) => {
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch)
+      setcookie(user, res, `Welcome back, ${user.name}`, 200);
       return res
         .status(404)
         .json({ success: false, message: "Invalid Email or Password." });
 
-    setcookie(user, res, `Welcome back, ${user.name}`, 200);
   } catch (error) {
     next(error);
   }
